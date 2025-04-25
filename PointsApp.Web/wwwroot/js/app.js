@@ -4,6 +4,7 @@
         this.layer = null;
         this.selectedPoint = null;
         this.selectedComment = null;
+        this.isEditing = false;
     }
 
     init() {
@@ -41,6 +42,10 @@
     }
 
     showForm(x = null, y = null) {
+        this.isEditing = false;
+        this.selectedPoint = null;
+
+
         $('#point-x').val(x ?? this.stage.width() / 2);
         $('#point-y').val(y ?? this.stage.height() / 2);
         $('#point-color').val('#ff0000');
@@ -85,13 +90,18 @@
                 contentType: 'application/json',
                 data: JSON.stringify({ text, backgroundColor }),
                 success: () => {
+                    this.selectedPoint = null;
+                    this.selectedComment = null;
                     this.layer.destroyChildren();
                     this.loadPoints();
                     this.hideCommentForm();
+
                 },
                 error: () => alert('Ошибка при редактировании комментария')
             });
-        } else {
+        }
+
+         else {
             $.ajax({
                 url: `/api/comments`,
                 method: 'POST',
@@ -119,6 +129,8 @@
                 url: `/api/comments/${this.selectedComment.id}`,
                 method: 'DELETE',
                 success: () => {
+                    this.selectedPoint = null;
+                    this.selectedComment = null;
                     this.layer.destroyChildren();
                     this.loadPoints();
                     this.hideCommentForm();
@@ -129,26 +141,47 @@
     }
 
     createPointFromForm() {
-        const pointData = {
+        const updated = {
             x: parseFloat($('#point-x').val()),
             y: parseFloat($('#point-y').val()),
             color: $('#point-color').val(),
             radius: parseFloat($('#point-radius').val())
         };
 
-        $.ajax({
-            url: '/api/points',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(pointData),
-            success: (savedPoint) => {
-                const group = this.createCircle(savedPoint);
-                this.layer.add(group);
-                this.layer.draw();
-                this.hideForm();
-            },
-            error: () => alert('Ошибка при создании точки')
-        });
+        if (this.isEditing && this.selectedPoint) {
+            updated.id = this.selectedPoint.id;
+            console.log('Creating point with:', updated);
+            $.ajax({
+                url: `/api/points/${updated.id}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(updated),
+                success: () => {
+                    this.selectedPoint = null;
+                    this.selectedComment = null;
+                    this.layer.destroyChildren();
+                    this.loadPoints();
+                    this.hideForm();
+                },
+                error: () => alert('Ошибка при обновлении точки')
+            });
+        } else {
+            console.log('Creating point with:', updated);
+            $.ajax({
+                url: '/api/points',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(updated),
+                success: (savedPoint) => {
+                    console.log('Saved point (from server):', savedPoint);
+                    const group = this.createCircle(savedPoint);
+                    this.layer.add(group);
+                    this.layer.draw();
+                    this.hideForm();
+                },
+                error: () => alert('Ошибка при создании точки')
+            });
+        }
     }
 
     createCircle(point) {
@@ -242,6 +275,14 @@
                     success: () => {
                         group.destroy();
                         this.layer.draw();
+
+                        if (this.selectedPoint && this.selectedPoint.id === point.id) {
+                            this.selectedPoint = null;
+                            this.selectedComment = null;
+                        }
+
+                        $('#context-menu').hide();
+                        $('#comment-form-modal').hide();
                     },
                     error: () => alert('Ошибка при удалении точки')
                 });
@@ -309,36 +350,14 @@
     showEditForm() {
         if (!this.selectedPoint) return;
 
+        this.isEditing = true;
+
         $('#point-x').val(this.selectedPoint.x);
         $('#point-y').val(this.selectedPoint.y);
         $('#point-color').val(this.selectedPoint.color);
         $('#point-radius').val(this.selectedPoint.radius);
 
         $('#point-form-modal').fadeIn();
-
-        $('#create-point-btn').off('click').on('click', () => {
-            const updated = {
-                ...this.selectedPoint,
-                x: parseFloat($('#point-x').val()),
-                y: parseFloat($('#point-y').val()),
-                color: $('#point-color').val(),
-                radius: parseFloat($('#point-radius').val())
-            };
-
-            $.ajax({
-                url: `/api/points/${updated.id}`,
-                method: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(updated),
-                success: () => {
-                    this.layer.destroyChildren();
-                    this.loadPoints();
-                    this.hideForm();
-                },
-                error: () => alert('Ошибка при обновлении точки')
-            });
-        });
-
         $('#context-menu').hide();
     }
 }

@@ -23,10 +23,10 @@ namespace PointsApp.Infrastructure.Repositories
 
         public async Task<Point> AddAsync(Point point)
         {
-            await _appDbContext.AddAsync(point);
+           var entry =  await _appDbContext.AddAsync(point);
             await _appDbContext.SaveChangesAsync();
 
-            return await _appDbContext.Points.LastAsync();
+            return entry.Entity;
         }
 
         public async Task UpdateAsync(Point point)

@@ -4,7 +4,7 @@ using PointsApp.Domain.Interfaces;
 
 namespace PointsApp.Infrastructure.Repositories
 {
-    public  class CommentsRepository : ICommentsRepository
+    public class CommentsRepository : ICommentsRepository
     {
         private readonly AppDbContext _appDbContext;
 
@@ -23,8 +23,9 @@ namespace PointsApp.Infrastructure.Repositories
         {
             try
             {
-                await _appDbContext.AddAsync(comment);
+                var entry = await _appDbContext.AddAsync(comment);
                 await _appDbContext.SaveChangesAsync();
+                return entry.Entity;
             }
 
             catch (Exception ex)
@@ -32,8 +33,6 @@ namespace PointsApp.Infrastructure.Repositories
                 Console.WriteLine("Ошибка при сохранении комментария: " + ex.Message);
                 throw;
             }
-
-            return await _appDbContext.Comments.LastAsync();
         }
 
         public async Task UpdateAsync(Comment comment)
@@ -45,11 +44,11 @@ namespace PointsApp.Infrastructure.Repositories
         public async Task DeleteAsync(int id)
         {
             var comment = await GetByIdAsync(id);
-            if(comment != null)
+            if (comment != null)
             {
                 _appDbContext.Remove(comment);
                 await _appDbContext.SaveChangesAsync();
-            }    
+            }
         }
     }
 }
