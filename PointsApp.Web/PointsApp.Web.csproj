@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PointsApp.Application\PointsApp.Application.csproj" />
+    <ProjectReference Include="..\PointsApp.Infrastructure\PointsApp.Infrastructure.csproj" />
+	  <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
+	  <InternalsVisibleTo Include="PointsApp.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\lib\" />
+  </ItemGroup>
+
+</Project>

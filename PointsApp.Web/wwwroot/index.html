@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Points App</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <script defer src="lib/jquery.min.js"></script>
+    <script defer src="lib/konva.min.js"></script>
+    <script defer src="js/app.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <button id="add-point-btn">Добавить точку</button>
+    </header>
+
+    <main id="main-content">
+        <div id="konva-container"></div>
+    </main>
+
+    <div id="point-form-modal" class="modal">
+        <div class="modal-content">
+            <h3>Добавить точку</h3>
+            <label>X: <input type="number" id="point-x" /></label><br />
+            <label>Y: <input type="number" id="point-y" /></label><br />
+            <label>Цвет: <input type="color" id="point-color" value="#ff0000" /></label><br />
+            <label>Радиус: <input type="number" id="point-radius" value="10" /></label><br />
+            <button id="create-point-btn">Создать</button>
+            <button id="cancel-point-btn">Отмена</button>
+        </div>
+    </div>
+    <div id="comment-form-modal" style="display:none; position: fixed; top: 20%; left: 50%; transform: translate(-50%, 0); background: white; padding: 20px; border: 1px solid #ccc; z-index: 1000;">
+        <label>Текст комментария:</label><br>
+        <textarea id="comment-text" style="width:100%;"></textarea><br><br>
+        <label>Цвет фона:</label><br>
+        <input type="color" id="comment-bg-color" value="#ffffcc"><br><br>
+        <button id="save-comment-btn">Сохранить</button>
+        <button id="cancel-comment-btn">Отмена</button>
+        <button id="delete-comment-btn" style="display: none; background-color: red; color: white;">Удалить</button>
+    </div>
+    <div id="context-menu" style="display:none; position:absolute; background:white; border:1px solid gray; padding:5px; z-index:1000;">
+        <button id="add-comment-btn">Добавить комментарий</button><br>
+        <button id="edit-point-btn">Изменить свойства точки</button>
+    </div>
+</body>
+</html>
